@@ -1,0 +1,59 @@
+//health, weapon, spider strength 
+private final double[][] data = { 
+	// the first value it takes is health 
+	// the second value it takes is weapon
+	// the third value it takes is the strength of the spider 
+	
+	// here are all the possible outcomes the player can get into 
+	// for example if he has mid health and mid weapon and the spider he is going against has mid strength 
+	// the spider is going to attack him
+	// another example would be { 2, 1, 0 }
+	// here the player has max health and has a mid range weapon
+	// where as the spider is weak 
+	// so the spider decides to run with the help of nn
+	{ 0, 0, 0 },{ 1, 1, 1 },{ 2, 2, 2 },{ 2, 0, 0 }, 
+	{ 0, 1, 0 },{ 0, 2, 0 },{ 0, 0, 0 },{ 0, 0, 1 },
+	{ 0, 0, 2 },{ 1, 1, 0 },{ 1, 2, 0 },{ 2, 1, 0 },
+	{ 2, 2, 0 },{ 2, 2, 1 },{ 1, 0, 1 },{ 1, 0, 2 },
+	{ 2, 0, 1 },{ 2, 0, 2 },{ 0, 1, 1 },{ 0, 1, 2 },
+	{ 0, 2, 1 },{ 0, 2, 2 },{ 1, 0, 0 }
+};
+
+//Panic, Attack, Hide
+private final double[][] expected = {
+
+	//1) when the weak health + weak weapon + weak strength spider = attack 
+	//2) when the mid health + mid weapon + mid strength spider = attack
+	//3) when the Max health + strong weapon + Strong strength spider = attack  
+	//4) when the Max health + weak weapon + weak spider strength = hide
+	{ 0.0, 1.0, 0.0 },{ 0.0, 1.0, 0.0 },{ 0.0, 1.0, 0.0 },{ 0.0, 0.0, 1.0 },
+	
+	//1) when the weak health + mid weapon + weak strength spider = panic 
+	//2) when the weak health + Strong weapon + weak strength spider = hide
+	//3) when the weak health + weak weapon + weak strength spider = attack  
+	//4) when the weak health + weak weapon + weak spider strength = attack
+	{ 1.0, 0.0, 0.0 },{ 0.0, 0.0, 1.0 },{ 0.0, 1.0, 0.0 },{ 0.0, 1.0, 0.0 },
+	
+	//1) when the weak health + weak weapon + Strong strength spider = attack 
+	//2) when the mid health + mid weapon + weak strength spider = hide
+	//3) when the mid health + strong weapon + weak strength spider = hide  
+	//4) when the strong health + mid weapon + weak spider strength = hide
+	{ 0.0, 1.0, 0.0 },{ 0.0, 0.0, 1.0 },{ 0.0, 0.0, 1.0 },{ 0.0, 0.0, 1.0 },
+	
+	//1) when the strong health + strong weapon + weak strength spider = hide 
+	//2) when the strong health + strong weapon + mid strength spider = panic
+	//3) when the mid health + weak weapon + mid strength spider = panic  
+	//4) when the mid health + weak weapon + Strong strength spider = attack
+	{ 0.0, 0.0, 1.0 },{ 1.0, 0.0, 0.0 },{ 1.0, 0.0, 0.0 },{ 0.0, 1.0, 0.0 },
+	
+	//1) when the strong health + strong weapon + mid strength spider = panic 
+	//2) when the strong health + strong weapon + Strong strength spider = attack
+	//3) when the weak health + mid weapon + weak spider = panic  
+	//4) when the weak health + mid weapon + strong spider = attack
+	{ 1.0, 0.0, 0.0 },{ 0.0, 1.0, 0.0 },{ 1.0, 0.0, 0.0 },{ 0.0, 1.0, 0.0 },
+
+	//1) when the weak health + strong weapon + mid strength spider = panic 
+	//2) when the weak health + strong weapon + Strong strength spider = attack
+	//3) when the mid health + weak weapon + weak strength spider = hide 
+	{ 1.0, 0.0, 0.0 },{ 0.0, 1.0, 0.0 },{ 0.0, 0.0, 1.0 }
+};

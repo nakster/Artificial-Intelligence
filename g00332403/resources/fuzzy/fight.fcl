@@ -1,0 +1,94 @@
+// Block definition (there may be more than one block per file)
+// used the Combat Sugeno Inference Example provided on Moodle to design this 
+FUNCTION_BLOCK fight	
+	
+	// Define input variables
+	// the game will send the two variable whenever the 
+	// the spider is attacking 
+	// so the weapon and the spider strength is sent
+	VAR_INPUT				
+		weapon : REAL;
+		enemy : REAL;
+	END_VAR
+	
+	// Define output variable
+	// this is what is going to be returned by the fuzzy logic 
+	// this will be used to calculate the new health for the player when the spider 
+	// attacks 
+	VAR_OUTPUT				
+		damage : REAL;
+	END_VAR
+	
+	// first i set the weapon is sent
+	// and is compared against the following 
+	// if the weapon of the spider is between 0 and 60 its going to be harmless
+	// if the weapon is between 20 and 80 its going to be dangerous 
+	// if the weapon is between 40 to 100 then its going to be lethal
+	// depending on the weapon of spider the greater the attack would be 
+	FUZZIFY weapon
+	 TERM harmless := (0, 1) (20, 1) (60, 0);
+	 TERM dangerous := trian 20 50 80;
+	 TERM lethal := (40, 0) (80, 1) (100, 1);
+	END_FUZZIFY
+	
+	// if the enemy strenth is between 0 and 40 its going to be weak 
+	// if the its between 30 and 70 its going to be in the strong range 
+	// if the enemy is between 60 and 100 its going to be formiddable
+	// the stronger the enemy the greater the attack is going to be 
+	FUZZIFY enemy
+	 TERM weak := trian 0 20 40;
+	 TERM strong := trian 30 50 70;
+	 TERM formidable := trian 60 80 100;
+	END_FUZZIFY
+	
+	//here i calculate the damage which is going to be ouput to determine the new health
+	// which will be used to calculate the new health of the player 
+	DEFUZZIFY damage
+	 TERM small := (19,0) (20, 1) (21, 0);
+	 TERM partial := (49,0) (50, 1) (51, 0);
+	 TERM great := (79,0) (80, 1) (81, 0);
+	 METHOD : COG;
+	 DEFAULT := 0;
+	END_DEFUZZIFY
+	
+	/*
+		in the java game i have assigned these values to the spiders 
+		so their weapon and strength depend on what type of spider they are 
+		so depending what type of spider the player comes in contact it damages it differently
+		for example the black spider would attack the player and the player would lose
+		65 from its strength where us if a yellow spider attacks the player only loses about 20
+
+		spider		  weapon, enemy = damage
+		Black spider  70       80   =  65
+		Blue spider   65       65   =  60.1
+		Brown spider  55       60   =  44.1
+		Green spider  45       50   =  38.6
+		Grey spider   40       40   =  36.3
+		Orange spider 70       80   =  65
+		Red spider    30       20   =  30
+		Yellow spider 20       20   =  20
+	*/
+	
+	//Combat Sugeno Inference
+	// i calculate if the player is effected by the spider partially or greatly 
+	RULEBLOCK BlockA
+	 AND : MIN;
+	 ACT : MIN;
+	 ACCU : MAX;
+	 // i check here what conditions apply to calculate the damage 
+	 // RULE 1 is basically if the spider weapon is dangerous or enemy is strong then its going to damage players health partially 
+	 // RULE 2 if the spider weapon is lethal or enemy is formidable then the risk is also going to be partial
+	 // RULE 3 if the spider weapon is harmless or enemy is weak then its going to be low damage to the player
+	 // RULE 4 if the spider weapon is dangerous and enemy is strong then its going to damage players health it partially 
+	 // RULE 5 if the spider weapon is lethal and enemy is formidable then damage to players health is going to be great
+	 // RULE 6 if the spider weapon is harmless and enemy is weak then its going to be low damage to the players health
+	 RULE 1 : IF weapon IS dangerous OR enemy IS strong THEN damage IS partial;
+	 RULE 2 : IF weapon IS lethal OR enemy IS formidable THEN damage IS partial;
+	 RULE 3 : IF weapon IS harmless OR enemy IS weak THEN damage IS small;
+	 RULE 4 : IF weapon IS dangerous AND enemy IS strong THEN damage IS partial;
+	 RULE 5 : IF weapon IS lethal AND enemy IS formidable THEN damage IS great;
+	 RULE 6 : IF weapon IS harmless AND enemy IS weak THEN damage IS small;
+	 
+	END_RULEBLOCK
+
+END_FUNCTION_BLOCK
